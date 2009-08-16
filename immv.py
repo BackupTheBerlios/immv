@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from optparse import OptionParser
+import os
 import os.path
+import subprocess
 import shutil
+import tempfile
 
 class FileNotFoundException(Exception):
   def __init__(self, filename):
@@ -11,6 +14,12 @@ class FileNotFoundException(Exception):
   def __str__(self):
     return repr(self.filename)
 
+class FileCountChangedException(Exception):
+  def __init__(self, orig_count, new_count):
+    self.orig_count= orig_count
+    self.new_count= new_count
+  def __str__(self):
+    return "original count="+str(self.orig_count)+", new count="+str(self.new_count)
 
 
 def parseCommandline():
@@ -42,6 +51,14 @@ def filenames_to_string(filenames):
     fn_string+= os.path.basename(f)+"\n"
   return fn_string
 
+def get_base_file_names(filenames):
+  base_file_names= []
+  for f in filenames:
+    if not os.path.lexists(f):
+      raise FileNotFoundException(f)
+    base_file_names.append(os.path.basename(f))
+  return base_file_names
+    
 
 def check_files_exist(filenames):
   for f in filenames:
@@ -49,13 +66,17 @@ def check_files_exist(filenames):
       raise FileNotFoundException(f)
 
 
-def callEditorForEditing(fn_string):
-  return []
+def callEditorForEditing(temp_file):
+  env_editor= os.getenv("EDITOR")
+  if env_editor is None:
+    #FIXME: is this too debian specific
+    env_editor='sensible-editor'
+  retcode= subprocess.call([env_editor, temp_file.name])
 
 
 def get_files_to_rename(old_files, new_files):
   if len(old_files) != len(new_files):
-    raise Exception("Error: Number of filenames changed. Cannot proceed.")
+    raise FileCountChangedException(len(old_files), len(new_files))
 
   files_to_rename= []
   for i in range(0, len(old_files)):
@@ -64,27 +85,62 @@ def get_files_to_rename(old_files, new_files):
   
   return files_to_rename
 
+def get_temp_file():
+  return tempfile.NamedTemporaryFile(mode='w+')
+
+def fill_temp_file(old_files, temp_file):
+  print 1
+  for f in old_files:
+    print 2
+    temp_file.write(f+"\n")
+  print 3
+  temp_file.flush()
+
+def strip_eol(list_of_strings):
+  stripped= []
+  for item in list_of_strings:
+    stripped.append(item.strip())
+  return stripped
+
 
 if __name__ == "__main__":
   #parse Kommandozeile
   (options, args)= parseCommandline()
   #prüfe, ob auch wirklich alles Dateinamen sind
   try:
-    #Erstelle String aus Dateinamen
-    fn_string= filenames_to_string(args)
-    #zeige Editor mit fn_strings
-    changedFileNames= callEditorForEditing(fn_string)
-    rename_list= get_files_to_rename(args, changedFileNames)
+#    #Erstelle String aus Dateinamen
+#    fn_string= filenames_to_string(args)
+    base_file_names= get_base_file_names(args)
 
+    #erzeuge temp_file
+    temp_file= get_temp_file()
+    fill_temp_file(base_file_names, temp_file)
+
+    #zeige Editor mit temp_file
+    callEditorForEditing(temp_file)
+
+    #lies geändertes temp_file
+    temp_file.seek(0)
+    lines= temp_file.readlines()
+    temp_file.close()
+
+    #FIXME: Hier nicht die basenames übergeben, sondern die vollen Pfade
+    #       Das muss auch der Methode übergeben werden, da sonst der 
+    #       Rückgabewert nicht zu den Pfaden zugeordnet werden kann
+    #       Oder auf die rename_list wird verzichtet und einfach über
+    #       die Liste iteriert und bei jeder Datei geprüft, ob sie
+    #       umbenannt wird.
+    rename_list= get_files_to_rename(base_file_names, strip_eol(lines))
     for t in rename_list:
     #TODO: prüfe, ob destfile schon existiert + Exception
       shutil.move(t[0], t[1])
       
   except FileNotFoundException, e:
-    print "file not found: "+e.filename
+    print "Error! File not found: "+e.filename
     exit(1)
-  except Exception, e:
-    print e
+  except FileCountChangedException, e:
+    print "ERROR! Number of files changed: ",e
+    exit(2)
 
 #  file_list= get_file_list(args)
 #  print file_list
