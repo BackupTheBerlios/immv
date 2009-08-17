@@ -58,6 +58,19 @@ def get_base_file_names(filenames):
       raise FileNotFoundException(f)
     base_file_names.append(os.path.basename(f))
   return base_file_names
+
+
+def split_path_and_filenames(filenames):
+  paths= []
+  base_file_names= []
+  for f in filenames:
+    if not os.path.lexists(f):
+      raise FileNotFoundException(f)
+    path, basename= os.path.split(f)
+    paths.append(path)
+    base_file_names.append(basename)
+  return paths, base_file_names
+  
     
 
 def check_files_exist(filenames):
@@ -110,7 +123,9 @@ if __name__ == "__main__":
   try:
 #    #Erstelle String aus Dateinamen
 #    fn_string= filenames_to_string(args)
-    base_file_names= get_base_file_names(args)
+#    base_file_names= get_base_file_names(args)
+#    paths_of_file_names= get_paths_of_file_names(args)
+    paths, base_file_names= split_path_and_filenames(args)
 
     #erzeuge temp_file
     temp_file= get_temp_file()
@@ -123,17 +138,15 @@ if __name__ == "__main__":
     temp_file.seek(0)
     lines= temp_file.readlines()
     temp_file.close()
+    new_file_names= strip_eol(lines)
 
-    #FIXME: Hier nicht die basenames übergeben, sondern die vollen Pfade
-    #       Das muss auch der Methode übergeben werden, da sonst der 
-    #       Rückgabewert nicht zu den Pfaden zugeordnet werden kann
-    #       Oder auf die rename_list wird verzichtet und einfach über
-    #       die Liste iteriert und bei jeder Datei geprüft, ob sie
-    #       umbenannt wird.
-    rename_list= get_files_to_rename(base_file_names, strip_eol(lines))
-    for t in rename_list:
-    #TODO: prüfe, ob destfile schon existiert + Exception
-      shutil.move(t[0], t[1])
+    for path, orig_filename, new_filename in \
+        zip(paths, base_file_names, new_file_names):
+      print "P: %s, OFN: %s, NFN: %s" % (path, orig_filename, new_filename)
+      if not orig_filename == new_filename:
+        #TODO: prüfe, ob destfile schon existiert + Exception
+        shutil.move(os.path.join(path, orig_filename),\
+                    os.path.join(path, new_filename))
       
   except FileNotFoundException, e:
     print "Error! File not found: "+e.filename

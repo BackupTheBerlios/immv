@@ -14,5 +14,6 @@ immv - Interactive Multi Move
   --ask (Anzeige, was getan werden soll + Bestätigung / Abbrechen / bearbeiten)
   --verbose
   --quiet
+  --overwrite (Überschreibt bereits vorhandene Dateien)
 
 * entweder in python oder in D schreiben
