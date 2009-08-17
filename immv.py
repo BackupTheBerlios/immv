@@ -7,6 +7,7 @@ import os.path
 import subprocess
 import shutil
 import tempfile
+import readline
 
 
 ################################################################
@@ -47,6 +48,9 @@ def parse_commandline():
   parser.add_option("-o", "--overwrite", dest="overwrite_files", default=False,
                     action="store_true",
                     help="overwrite existing files")
+  parser.add_option("-i", "--interactive", dest="interactive", default=False,
+                    action="store_true",
+                    help="ask for confirmation before overwriting existing files")
 
   (options, args)= parser.parse_args()
   return (options, args)
@@ -98,13 +102,53 @@ def strip_eol(list_of_strings):
   return stripped
 
 
-def do_rename(paths, base_file_names, new_file_names):
+def do_rename(paths, base_file_names, new_file_names, options):
+  for path, orig_filename, new_filename in \
+      zip(paths, base_file_names, new_file_names):
+    if orig_filename == new_filename:
+      info("No change to file "+os.path.join(path, old_filename))
+    else:
+      skip_file= False
+      if os.path.lexists(os.path.join(path, new_filename)):
+        if 'interactive' in options:
+          confirmed= ask_for_overwrite(os.path.join(path, orig_filename),\ 
+                                       os.path.join(path, new_filename))
+          if not confirmed:
+            info("Skipped file "+os.path.join(path, orig_filename))
+            skip_file= True
+        elif not 'overwrite' in options:
+          info("Skipped file "+os.path.join(path, orig_filename))
+          skip_file= True
+      
+      if not skip_file:
+        shutil.move(os.path.join(path, orig_filename),\
+                      os.path.join(path, new_filename))
+
+
+def ask_for_overwrite(old_file, new_file):
+  answer= raw_input(old_file+" -> "+new_file+"\n"+ \
+                      new_file+" exists. Overwrite? (y/N):")
+  if answer in ('y', 'Y', 'yes', 'Yes', 'YES'):
+    return True
+  else:
+    return False
+
+
+def info(string, options):
+  """Prints an informational message, unless --quiet was set"""
+  if "verbose" in options:
+    print string
+
+
+def simulate_rename(paths, base_file_names, new_file_names):
   for path, orig_filename, new_filename in \
       zip(paths, base_file_names, new_file_names):
     if not orig_filename == new_filename:
-      #TODO: prüfe, ob destfile schon existiert + Exception
-      shutil.move(os.path.join(path, orig_filename),\
-                    os.path.join(path, new_filename))
+      print os.path.join(path, orig_filename)+": -> "+ \
+            os.path.join(path, new_filename)
+    else:
+      print os.path.join(path, orig_filename)+": no change"
+
 
 
 ################################################################
@@ -135,6 +179,11 @@ if __name__ == "__main__":
 
 
     #Führe das Umbenennen durch
+    if 'needs_confirmation' in options:
+      simulate_rename(paths, base_file_names, new_file_names)
+      answer= raw_input("Continue with rename? (y/N): ")
+      if not answer in ('y', 'Y', 'yes', 'Yes', 'YES'):
+        exit(9)
     do_rename(paths, base_file_names, new_file_names)
       
   except FileNotFoundException, e:
