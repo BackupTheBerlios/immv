@@ -1,0 +1,5 @@
+* schreibe Fehler nach stderr
+* manpage
+* Paketierung (für Debian)
+* Testfälle schreiben (unit + vlt. händische)
+* auf berlios (oder sonstwo) hochladen
