@@ -25,6 +25,10 @@ Fehlerfälle
 * Umzubenennende Datei existiert nicht mehr (wurde zwischenzeitlich gelöscht)
 * Fehlende Schreibrechte
 * Anzahl Dateien hat sich geändert
+* Editor wurde ohne Schreiben geschlossen (das gilt als Abbruch -> wie geht
+  das?)
+* Übergebene Strings sind nicht alles existierende Dateien
+* Gar keine Argumente (Dateinamen) übergeben
 
 Kein Fehlerfall
 ===============
