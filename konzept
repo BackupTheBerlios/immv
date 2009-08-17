@@ -15,5 +15,18 @@ immv - Interactive Multi Move
   --verbose
   --quiet
   --overwrite (Überschreibt bereits vorhandene Dateien)
+  --interactive-overwrite (Fragt bei jeder Datei nach, ob sie überschrieben
+                           werden soll)
 
 * entweder in python oder in D schreiben
+
+Fehlerfälle
+===========
+* Umzubenennende Datei existiert nicht mehr (wurde zwischenzeitlich gelöscht)
+* Fehlende Schreibrechte
+* Anzahl Dateien hat sich geändert
+
+Kein Fehlerfall
+===============
+* Eine nicht zu ändernde Datei existiert nicht mehr oder hat fehlende
+  Schreibrechte
