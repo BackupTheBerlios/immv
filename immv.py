@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 from optparse import OptionParser
@@ -38,7 +38,8 @@ class FileCountChangedException(Exception):
 
 def parse_commandline():
   usage= "usage: %prog [options] FILES"
-  parser= OptionParser(usage=usage)
+  version= "%prog -Interactive Multi MoVe- 0.1"
+  parser= OptionParser(usage=usage, version=version)
   parser.add_option("-a", "--ask", dest="needs_confirmation", default=False,
                     action="store_true",
                     help="ask for confirmation before doing anything")
@@ -53,6 +54,13 @@ def parse_commandline():
                     help="ask for confirmation before overwriting existing files")
 
   (options, args)= parser.parse_args()
+
+  #FIXME: Shouldn't this be moved to check_args()?
+  #       But then the parser needs to be global
+  if len(args) == 0:
+    parser.print_help()
+    exit(4)
+
   return (options, args)
 
 
@@ -105,24 +113,25 @@ def strip_eol(list_of_strings):
 def do_rename(paths, base_file_names, new_file_names, options):
   for path, orig_filename, new_filename in \
       zip(paths, base_file_names, new_file_names):
+    orig_path= os.path.join(path, orig_filename)
+    new_path= os.path.join(path, new_filename)
     if orig_filename == new_filename:
-      info("No change to file "+os.path.join(path, old_filename))
+      info("No change to file "+orig_path, options)
     else:
       skip_file= False
-      if os.path.lexists(os.path.join(path, new_filename)):
-        if 'interactive' in options:
-          confirmed= ask_for_overwrite(os.path.join(path, orig_filename),\ 
-                                       os.path.join(path, new_filename))
+      if os.path.lexists(new_path):
+        if options.interactive:
+          confirmed= ask_for_overwrite(orig_path, new_path)
           if not confirmed:
-            info("Skipped file "+os.path.join(path, orig_filename))
+            info("Skipped file "+orig_path, options)
             skip_file= True
-        elif not 'overwrite' in options:
-          info("Skipped file "+os.path.join(path, orig_filename))
+        elif not options.overwrite_files:
+          info("Skipped file "+orig_path+" (target name exists)", options)
           skip_file= True
       
       if not skip_file:
-        shutil.move(os.path.join(path, orig_filename),\
-                      os.path.join(path, new_filename))
+        info("Renamed file "+orig_path+" -> "+new_path, options)
+        shutil.move(orig_path, new_path)
 
 
 def ask_for_overwrite(old_file, new_file):
@@ -136,7 +145,7 @@ def ask_for_overwrite(old_file, new_file):
 
 def info(string, options):
   """Prints an informational message, unless --quiet was set"""
-  if "verbose" in options:
+  if options.verbose:
     print string
 
 
@@ -150,6 +159,9 @@ def simulate_rename(paths, base_file_names, new_file_names):
       print os.path.join(path, orig_filename)+": no change"
 
 
+def check_args(args):
+  pass
+    
 
 ################################################################
 ##
@@ -159,7 +171,8 @@ def simulate_rename(paths, base_file_names, new_file_names):
 if __name__ == "__main__":
   #parse Kommandozeile
   (options, args)= parse_commandline()
-  #prüfe, ob auch wirklich alles Dateinamen sind
+  #TODO: prüfe, ob auch wirklich alles Dateinamen sind
+  #      brich ab, wenn keine angegeben
   try:
     #Trenne Pfade von Dateinamen
     paths, base_file_names= split_path_and_filenames(args)
@@ -179,17 +192,17 @@ if __name__ == "__main__":
 
 
     #Führe das Umbenennen durch
-    if 'needs_confirmation' in options:
+    if options.needs_confirmation:
       simulate_rename(paths, base_file_names, new_file_names)
       answer= raw_input("Continue with rename? (y/N): ")
       if not answer in ('y', 'Y', 'yes', 'Yes', 'YES'):
         exit(9)
-    do_rename(paths, base_file_names, new_file_names)
+    do_rename(paths, base_file_names, new_file_names, options)
       
   except FileNotFoundException, e:
     print "Error! File not found: "+e.filename
     exit(2)
   except FileCountChangedException, e:
-    print "ERROR! Number of files changed: ",e
+    print "Error! Number of files changed: ",e
     exit(3)
 
