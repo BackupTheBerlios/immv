@@ -3,3 +3,5 @@
 * Paketierung (für Debian)
 * Testfälle schreiben (unit + vlt. händische)
 * auf berlios (oder sonstwo) hochladen
+* Parameter einführen, mit dem der Editor angegeben werden kann?
+* manpage auf asciidoc umstellen?
