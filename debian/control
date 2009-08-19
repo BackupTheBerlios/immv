@@ -1,0 +1,15 @@
+Source: immv
+Section: utils
+Priority: extra
+Maintainer: Marco Herrn <marco@mherrn.de>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.7.3
+Homepage: http://immv.berlios.de
+
+Package: immv
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python
+Description: Rename multiple files interactively
+ immv allows to rename multiple files at once by providing an editor with
+ the names of the given files. This allows to use sophisticated features of
+ this editor (for example vim) to efficiently rename a whole bunch of files.
