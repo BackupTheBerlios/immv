@@ -29,6 +29,7 @@ build-stamp: configure-stamp
 	# Add here commands to compile the package.
 #	$(MAKE)
 	#docbook-to-man debian/immv.sgml > immv.1
+	asciidoc -b docbook -d manpage -o - immv.1.txt | docbook2x-man --to-stdout - > immv.1
 
 	touch $@
 
@@ -39,6 +40,8 @@ clean:
 
 	# Add here commands to clean up after the build process.
 #	$(MAKE) clean
+	rm -f immv.1
+	rm -f *.py[co]
 
 	dh_clean 
 

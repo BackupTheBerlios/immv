@@ -1,0 +1,88 @@
+IMMV(1)
+=======
+
+NAME
+----
+immv - Interactive Multi MoVe
+
+
+SYNOPSIS
+--------
+*immv* ['options'] FILES
+
+
+DESCRIPTION
+-----------
+This program allows renaming of multiple files at once by providing an
+editor with the names of the given files.
+This way the sophisticated features of this editor (for example vim)
+can be used to rename a whole bunch of files.
+The editor used is the one specified in the environment variable
+'$EDITOR'.
+If this environment variable is empty, sensible-editor is used.
+
+The filenames displayed in the editor are just the base filenames
+without the path, since the path can’t be altered.
+It is possible to edit the names of files in different directories at 
+once.
+
+If the target name of a file already exists, this file is skipped 
+(unless the *--overwrite* or *--interactive* option is given).
+
+
+OPTIONS
+-------
+*--version*::
+    show program’s version number and exit
+
+*-h, --help*::
+    show this help message and exit
+
+*-a, --ask*::
+    ask for confirmation before doing anything
+
+*-q, --quiet*::
+    don’t output anything, except error messages
+
+*-o, --overwrite*::
+    overwrite existing files
+
+*-i, --interactive*::
+    ask for confirmation before overwriting existing files
+
+
+
+EXIT STATUS
+-----------
+*0*::
+    successfully completed
+
+*1*::
+    aborted before doing anything
+
+*2*::
+    failure while processing
+
+
+ENVIRONMENT
+-----------
+*EDITOR*::
+    If *$EDITOR* is set, it will be used for editing the file names,
+    otherwise *sensible-editor* is used.
+
+
+SEE ALSO
+--------
+*mmv*(1), *rename*(1)
+
+
+/////////////////////////////////////////
+AUTHOR
+------
+Written by Marco Herrn, <marco@mherrn.de>
+
+
+RESOURCES
+---------
+Main web site: <http://immv.berlios.de/>
+/////////////////////////////////////////
