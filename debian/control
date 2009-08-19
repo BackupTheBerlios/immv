@@ -2,7 +2,7 @@ Source: immv
 Section: utils
 Priority: extra
 Maintainer: Marco Herrn <marco@mherrn.de>
-Build-Depends: debhelper (>= 7)
+Build-Depends: debhelper (>= 7), asciidoc, docbook2x
 Standards-Version: 3.7.3
 Homepage: http://immv.berlios.de
 

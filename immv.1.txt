@@ -22,7 +22,7 @@ The editor used is the one specified in the environment variable
 If this environment variable is empty, sensible-editor is used.
 
 The filenames displayed in the editor are just the base filenames
-without the path, since the path can’t be altered.
+without the path, since the path can\’t be altered.
 It is possible to edit the names of files in different directories at 
 once.
 
@@ -33,7 +33,7 @@ If the target name of a file already exists, this file is skipped
 OPTIONS
 -------
 *--version*::
-    show program’s version number and exit
+    show program\’s version number and exit
 
 *-h, --help*::
     show this help message and exit
@@ -42,7 +42,7 @@ OPTIONS
     ask for confirmation before doing anything
 
 *-q, --quiet*::
-    don’t output anything, except error messages
+    don\’t output anything, except error messages
 
 *-o, --overwrite*::
     overwrite existing files
