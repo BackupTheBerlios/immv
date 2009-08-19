@@ -1,0 +1,26 @@
+Description
+===========
+
+This  program allows renaming of multiple files at once by providing an editor with
+the names of the given files. This way the sophisticated features  of  this  editor
+(for example vim) can be used to rename a whole bunch of files.  The editor used is
+the one specified in the environment variable $EDITOR.  If this  environment  vari‐
+able is empty, sensible-editor is used.
+
+The filenames displayed in the editor are just the base filenames without the path,
+since the path can’t be altered.  It is possible to edit the names of files in dif‐
+ferent directories at once.
+
+If  the  target  name  of  a  file already exists, this file is skipped (unless the
+--overwrite or --interactive option is given).
+
+See the manpage for more details about the allowed options.
+
+Bugs
+====
+
+Since this is the first released version of immv there may be bugs. Due to
+the nature of immv (renaming and possibly overwriting files) data loss is
+possible. 
+
+If you find bugs, please report them.
