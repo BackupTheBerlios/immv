@@ -1,5 +1,3 @@
-* schreibe Fehler nach stderr
-* manpage
 * Paketierung (für Debian)
 * Testfälle schreiben (unit + vlt. händische)
 * try/except Blöcke nicht so großflächig verwenden
