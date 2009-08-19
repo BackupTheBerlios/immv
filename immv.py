@@ -78,6 +78,20 @@ def _parse_commandline():
 
 
 def _split_path_and_filenames(filenames):
+  """Split a list full pathnames into their paths and base filenames.
+
+  filenames -- a list of filenames with or without paths
+  
+  Returns a tuple with a list of all the paths and a list of all the
+  base filenames. These two lists are both exactly as long as the
+  parameter 'filenames'.
+
+  This function also checks if the given files actually exist. If a file 
+  (or more than one) is not found in the system a FileNotFoundException
+  is raised for the first missing file.
+
+  """
+
   paths= []
   base_file_names= []
   for f in filenames:
@@ -90,6 +104,17 @@ def _split_path_and_filenames(filenames):
     
 
 def _check_files_exist(filenames):
+  """Check if all files in a given list actually exist.
+
+  filenames -- a list of filenames with or without path to check
+
+  If at least one file is not found, a FileNotFoundException is
+  raised for the first missing file.
+
+  This function doesn't return any value.
+
+  """
+
   for f in filenames:
     if not os.path.lexists(f):
       raise FileNotFoundException(f)
@@ -121,6 +146,19 @@ def _strip_eol(list_of_strings):
 
 
 def _simulate_rename(paths, base_file_names, new_file_names):
+  """Simulate the renaming that would actually be done.
+
+  This method prints out the original filenames with their path
+  and what would be done to them. Either no change or the name
+  of the resulting file with its path.
+
+  paths -- the pathnames of the files given
+  base_file_names -- the base file names without path of the
+                     original files
+  new_file_names -- the base file names of the resulting files
+
+  """
+
   for path, orig_filename, new_filename in \
       zip(paths, base_file_names, new_file_names):
     orig_path= os.path.join(path, orig_filename)
@@ -177,6 +215,7 @@ def _info(string, options):
   if options.verbose:
     print string
 
+
 def _error(string):
   """Prints an error message to stderr. 
      The --quiet option doesn't avoid this."""
@@ -189,7 +228,6 @@ def _error(string):
 ##
 
 if __name__ == "__main__":
-  #parse Kommandozeile
   (options, args)= _parse_commandline()
   try:
     _check_files_exist(args)
@@ -198,24 +236,22 @@ if __name__ == "__main__":
     exit(_EXIT_STATUS_ABORT)
 
   try:
-    #Trenne Pfade von Dateinamen
     paths, base_file_names= _split_path_and_filenames(args)
 
-    #Erzeuge temp_file
+    #create the temporary file to work on
     temp_file= _get_temp_file()
     _fill_temp_file(base_file_names, temp_file)
 
-    #Zeige Editor mit temp_file
     _call_editor(temp_file)
 
-    #Lies geändertes temp_file
+    #Read the edited temp_file
     temp_file.seek(0)
     lines= temp_file.readlines()
     temp_file.close()
     new_file_names= _strip_eol(lines)
 
 
-    #Führe das Umbenennen durch
+    #Now do the rename
     if options.needs_confirmation:
       _simulate_rename(paths, base_file_names, new_file_names, options)
       answer= raw_input("Continue with rename? (y/N): ")
