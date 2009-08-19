@@ -2,6 +2,7 @@
 * manpage
 * Paketierung (für Debian)
 * Testfälle schreiben (unit + vlt. händische)
+* try/except Blöcke nicht so großflächig verwenden
 * auf berlios (oder sonstwo) hochladen
 * Parameter einführen, mit dem der Editor angegeben werden kann?
 * manpage auf asciidoc umstellen?

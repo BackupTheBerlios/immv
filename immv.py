@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 """Interactictive Multi MoVe
 
+   Rename multiple files at once by editing their names in
+   a text editor.
 """
 
 __author__ = "Marco Herrn <marco@mherrn.de>"
@@ -9,6 +11,7 @@ __version__= "0.1"
 __license__= "GPL"
 
 from optparse import OptionParser
+import sys
 import os
 import os.path
 import subprocess
@@ -95,7 +98,7 @@ def _check_files_exist(filenames):
 def _call_editor(temp_file):
   env_editor= os.getenv("EDITOR")
   if env_editor is None:
-    #FIXME: is this too debian specific
+    #FIXME: is this too debian specific?
     env_editor='sensible-editor'
   retcode= subprocess.call([env_editor, temp_file.name])
 
@@ -105,11 +108,8 @@ def _get_temp_file():
 
 
 def _fill_temp_file(old_files, temp_file):
-  print 1
   for f in old_files:
-    print 2
     temp_file.write(f+"\n")
-  print 3
   temp_file.flush()
 
 
@@ -120,13 +120,24 @@ def _strip_eol(list_of_strings):
   return stripped
 
 
+def _simulate_rename(paths, base_file_names, new_file_names):
+  for path, orig_filename, new_filename in \
+      zip(paths, base_file_names, new_file_names):
+    orig_path= os.path.join(path, orig_filename)
+    new_path= os.path.join(path, new_filename)
+    if not orig_filename == new_filename:
+      _info(orig_path + ": -> " + new_path, options)
+    else:
+      _info(orig_path + ": no change", options)
+
+
 def _do_rename(paths, base_file_names, new_file_names, options):
   for path, orig_filename, new_filename in \
       zip(paths, base_file_names, new_file_names):
     orig_path= os.path.join(path, orig_filename)
     new_path= os.path.join(path, new_filename)
     if orig_filename == new_filename:
-      info("No change to file "+orig_path, options)
+      _info("No change to file "+orig_path, options)
     else:
       skip_file= False
       if os.path.lexists(new_path):
@@ -138,10 +149,18 @@ def _do_rename(paths, base_file_names, new_file_names, options):
         elif not options.overwrite_files:
           _info("Skipped file "+orig_path+" (target name exists)", options)
           skip_file= True
-      
+
+      #again test if the orig file still exists
+      if not os.path.lexists(orig_path):
+        _error("Error! File "+orig_path+" doesn't exist anymore?")
+        skip_file= True
+
       if not skip_file:
-        _info("Renamed file "+orig_path+" -> "+new_path, options)
-        shutil.move(orig_path, new_path)
+        _info("Rename file "+orig_path+" -> "+new_path, options)
+        try:
+          shutil.move(orig_path, new_path)
+        except Exception, e:
+          _error("+Unexpected Error! "+repr(e)+"\n+Please file a bug report.")
 
 
 def _ask_for_overwrite(old_file, new_file):
@@ -158,20 +177,11 @@ def _info(string, options):
   if options.verbose:
     print string
 
+def _error(string):
+  """Prints an error message to stderr. 
+     The --quiet option doesn't avoid this."""
+  sys.stderr.write(string+"\n")
 
-def _simulate_rename(paths, base_file_names, new_file_names):
-  for path, orig_filename, new_filename in \
-      zip(paths, base_file_names, new_file_names):
-    if not orig_filename == new_filename:
-      print os.path.join(path, orig_filename)+": -> "+ \
-            os.path.join(path, new_filename)
-    else:
-      print os.path.join(path, orig_filename)+": no change"
-
-
-def check_args(args):
-  pass
-    
 
 ################################################################
 ##
@@ -181,8 +191,12 @@ def check_args(args):
 if __name__ == "__main__":
   #parse Kommandozeile
   (options, args)= _parse_commandline()
-  #TODO: prüfe, ob auch wirklich alles Dateinamen sind
-  #      brich ab, wenn keine angegeben
+  try:
+    _check_files_exist(args)
+  except FileNotFoundException, e:
+    _error("Error! File not found: "+e.filename)
+    exit(_EXIT_STATUS_ABORT)
+
   try:
     #Trenne Pfade von Dateinamen
     paths, base_file_names= _split_path_and_filenames(args)
@@ -203,16 +217,16 @@ if __name__ == "__main__":
 
     #Führe das Umbenennen durch
     if options.needs_confirmation:
-      _simulate_rename(paths, base_file_names, new_file_names)
+      _simulate_rename(paths, base_file_names, new_file_names, options)
       answer= raw_input("Continue with rename? (y/N): ")
       if not answer in ('y', 'Y', 'yes', 'Yes', 'YES'):
         exit(_EXIT_STATUS_ABORT)
     _do_rename(paths, base_file_names, new_file_names, options)
       
   except FileNotFoundException, e:
-    print "Error! File not found: "+e.filename
+    _error("Error! File not found: "+e.filename)
     exit(_EXIT_STATUS_ERROR)
   except FileCountChangedException, e:
-    print "Error! Number of files changed: ",e
-    exit(_EXIT_STATUS_ERROR)
+    _error("Error! Number of files changed: ",e)
+    exit(_EXIT_STATUS_ABORT)
 
