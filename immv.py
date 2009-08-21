@@ -271,10 +271,8 @@ if __name__ == "__main__":
       if not answer in ('y', 'Y', 'yes', 'Yes', 'YES'):
         exit(_EXIT_STATUS_ABORT)
     _do_rename(paths, base_file_names, new_file_names, options)
-      
   except FileCountChangedException, e:
     _error("Error! Number of files changed")
 #    _debug("Original filecount: "+str(e.orig_count)+ \
 #           "new filecount: "+str(e.new_count))
     exit(_EXIT_STATUS_ABORT)
-
