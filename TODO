@@ -1,2 +1,5 @@
+* Wie kann ich bestimmte Errors bestimmen? Z.B IOError: Permission denied?
+* wie erfahr ich vom Editor, ob die Bearbeitung abgebrochen wurde?
+  -> mutt kann das
 * Testfälle schreiben (unit + vlt. händische)
 * auf berlios (oder sonstwo) hochladen
