@@ -50,6 +50,8 @@ OPTIONS
 *-i, --interactive*::
     ask for confirmation before overwriting existing files
 
+*-e* 'EDITOR', *--editor*='EDITOR':
+    editor to use for editing the filenames
 
 
 EXIT STATUS
