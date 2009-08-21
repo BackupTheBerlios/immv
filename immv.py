@@ -65,6 +65,8 @@ def _parse_commandline():
   parser.add_option("-i", "--interactive", dest="interactive", default=False,
                     action="store_true",
                     help="ask for confirmation before overwriting existing files")
+  parser.add_option("-e", "--editor", dest="editor",
+                    help="editor to use for editing the filenames")
 
   (options, args)= parser.parse_args()
 
@@ -120,10 +122,13 @@ def _check_files_exist(filenames):
       raise FileNotFoundException(f)
 
 
-def _call_editor(temp_file):
-  env_editor= os.getenv("EDITOR")
+def _call_editor(temp_file, options):
+  env_editor= None
+  if options.editor:
+    env_editor= options.editor
   if env_editor is None:
-    #FIXME: is this too debian specific?
+    env_editor= os.getenv("EDITOR")
+  if env_editor is None:
     env_editor='sensible-editor'
   retcode= subprocess.call([env_editor, temp_file.name])
 
@@ -159,6 +164,9 @@ def _simulate_rename(paths, base_file_names, new_file_names):
 
   """
 
+  if len(base_file_names) != len(new_file_names):
+    raise FileCountChangedException(len(base_file_names), len(new_file_names))
+
   for path, orig_filename, new_filename in \
       zip(paths, base_file_names, new_file_names):
     orig_path= os.path.join(path, orig_filename)
@@ -170,6 +178,9 @@ def _simulate_rename(paths, base_file_names, new_file_names):
 
 
 def _do_rename(paths, base_file_names, new_file_names, options):
+  if len(base_file_names) != len(new_file_names):
+    raise FileCountChangedException(len(base_file_names), len(new_file_names))
+
   for path, orig_filename, new_filename in \
       zip(paths, base_file_names, new_file_names):
     orig_path= os.path.join(path, orig_filename)
@@ -231,27 +242,29 @@ if __name__ == "__main__":
   (options, args)= _parse_commandline()
   try:
     _check_files_exist(args)
+    paths, base_file_names= _split_path_and_filenames(args)
   except FileNotFoundException, e:
     _error("Error! File not found: "+e.filename)
     exit(_EXIT_STATUS_ABORT)
 
+  #create the temporary file to work on
+  temp_file= _get_temp_file()
+  _fill_temp_file(base_file_names, temp_file)
+
   try:
-    paths, base_file_names= _split_path_and_filenames(args)
+    _call_editor(temp_file, options)
+  except OSError, e:
+    _error("Error calling editor: "+e.strerror)
+    exit(_EXIT_STATUS_ABORT)
 
-    #create the temporary file to work on
-    temp_file= _get_temp_file()
-    _fill_temp_file(base_file_names, temp_file)
+  #Read the edited temp_file
+  temp_file.seek(0)
+  lines= temp_file.readlines()
+  temp_file.close()
+  new_file_names= _strip_eol(lines)
 
-    _call_editor(temp_file)
-
-    #Read the edited temp_file
-    temp_file.seek(0)
-    lines= temp_file.readlines()
-    temp_file.close()
-    new_file_names= _strip_eol(lines)
-
-
-    #Now do the rename
+  #Now do the rename
+  try:
     if options.needs_confirmation:
       _simulate_rename(paths, base_file_names, new_file_names, options)
       answer= raw_input("Continue with rename? (y/N): ")
@@ -259,10 +272,9 @@ if __name__ == "__main__":
         exit(_EXIT_STATUS_ABORT)
     _do_rename(paths, base_file_names, new_file_names, options)
       
-  except FileNotFoundException, e:
-    _error("Error! File not found: "+e.filename)
-    exit(_EXIT_STATUS_ERROR)
   except FileCountChangedException, e:
-    _error("Error! Number of files changed: ",e)
+    _error("Error! Number of files changed")
+#    _debug("Original filecount: "+str(e.orig_count)+ \
+#           "new filecount: "+str(e.new_count))
     exit(_EXIT_STATUS_ABORT)
 
