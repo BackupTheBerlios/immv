@@ -70,7 +70,7 @@ EXIT STATUS
 ENVIRONMENT
 -----------
 *EDITOR*::
-    If *$EDITOR* is set, it will be used for editing the file names,
+    If '$EDITOR' is set, it will be used for editing the file names,
     otherwise *sensible-editor* is used.
     This can be overridden with the *--editor* option.
 
