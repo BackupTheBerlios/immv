@@ -3,7 +3,7 @@ Section: utils
 Priority: extra
 Maintainer: Marco Herrn <marco@mherrn.de>
 Build-Depends: debhelper (>= 7), asciidoc, docbook2x
-Standards-Version: 3.7.3
+Standards-Version: 3.8.2
 Homepage: http://immv.berlios.de
 
 Package: immv
