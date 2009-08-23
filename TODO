@@ -1,6 +1,5 @@
 * Prüfen, dass übergebene Dateien keine Directories sind
   Momentan scheint das erlaubt!
-* Wie kann ich bestimmte Errors bestimmen? Z.B IOError: Permission denied?
 * EXIT Code 2: Muss geschmissen werden, sobald mind. 1 Datei nicht
   umbenannt werden konnte
 * evtl. das --quite noch ein bisschen detaillierter (vlt. per --verbose)
@@ -13,7 +12,4 @@
   oder an erster Stelle ein einzelnes Zeichen mit Erfolgsnachricht
   z.B. ! = Fehler, ' ' = Alles ok
   oder ! = Fehler, ' ' = keine Änderung, . = alles ok
-* wie erfahr ich vom Editor, ob die Bearbeitung abgebrochen wurde?
-  -> mutt kann das
 * Testfälle schreiben (unit + vlt. händische)
-* auf berlios (oder sonstwo) hochladen
