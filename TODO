@@ -1,4 +1,18 @@
+* Prüfen, dass übergebene Dateien keine Directories sind
+  Momentan scheint das erlaubt!
 * Wie kann ich bestimmte Errors bestimmen? Z.B IOError: Permission denied?
+* EXIT Code 2: Muss geschmissen werden, sobald mind. 1 Datei nicht
+  umbenannt werden konnte
+* evtl. das --quite noch ein bisschen detaillierter (vlt. per --verbose)
+  - No change to file ist nicht immer interessant. Manchmal nur die
+    Änderungen
+* Allgemein die Ausgaben vlt. verkürzen
+  /tmp/origfile0 -> /tmp/newfile0
+  /tmp/origfile1 -> /tmp/newfile1 - Error! Permission denied
+  /tmp/origfile3 -> /tmp/newfile3
+  oder an erster Stelle ein einzelnes Zeichen mit Erfolgsnachricht
+  z.B. ! = Fehler, ' ' = Alles ok
+  oder ! = Fehler, ' ' = keine Änderung, . = alles ok
 * wie erfahr ich vom Editor, ob die Bearbeitung abgebrochen wurde?
   -> mutt kann das
 * Testfälle schreiben (unit + vlt. händische)

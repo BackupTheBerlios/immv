@@ -208,6 +208,8 @@ def _do_rename(paths, base_file_names, new_file_names, options):
         _info("Rename file "+orig_path+" -> "+new_path, options)
         try:
           shutil.move(orig_path, new_path)
+        except IOError, e:
+          _error("Error on "+new_path+": "+os.strerror(e.errno))
         except Exception, e:
           _error("+Unexpected Error! "+repr(e)+"\n+Please file a bug report.")
 
@@ -251,10 +253,16 @@ if __name__ == "__main__":
   temp_file= _get_temp_file()
   _fill_temp_file(base_file_names, temp_file)
 
+  mtime_before= os.path.getmtime(temp_file.name)
+
   try:
     _call_editor(temp_file, options)
   except OSError, e:
     _error("Error calling editor: "+e.strerror)
+    exit(_EXIT_STATUS_ABORT)
+
+  if os.path.getmtime(temp_file.name) == mtime_before:
+    # _debug("Nothing changed.")
     exit(_EXIT_STATUS_ABORT)
 
   #Read the edited temp_file
