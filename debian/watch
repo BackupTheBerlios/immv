@@ -1,0 +1,8 @@
+# Example watch control file for uscan
+# Rename this file to "watch" and then you can run the "uscan" command
+# to check for upstream updates and more.
+# Site		Directory		Pattern			Version	Script
+version=3
+opts=downloadurlmangle=s/prdownload/download/ \
+	http://developer.berlios.de/project/showfiles.php?group_id=11098 \
+	http://prdownload.berlios.de/immv/immv-(.*).tar.gz
