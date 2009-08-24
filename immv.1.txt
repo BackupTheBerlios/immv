@@ -77,7 +77,7 @@ ENVIRONMENT
 
 SEE ALSO
 --------
-*mmv*(1), *rename*(1)
+*mmv*(1), *rename*(1), *vidir*(1)
 
 
 /////////////////////////////////////////
