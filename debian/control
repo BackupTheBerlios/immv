@@ -7,7 +7,7 @@ Standards-Version: 3.8.2
 Homepage: http://immv.berlios.de
 
 Package: immv
-Architecture: any
+Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, python
 Description: Rename multiple files interactively
  immv allows to rename multiple files at once by providing an editor with
