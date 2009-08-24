@@ -1,5 +1,12 @@
 * Prüfen, dass übergebene Dateien keine Directories sind
   Momentan scheint das erlaubt!
+  -> ist erledigt. ABER MACHT DAS SINN!?
+     Warum sollen nicht auch Verzeichnisse umbenannt werden können?
+     Hier müsste vielmehr der Code geändert werden, um immer den
+	 letzten Teil des Pfads (also auch bei Verzeichnissen) zu ändern
+	 -> Soll dann zur Kenntlichmachung ein / am Ende des Namens stehen?
+        Das hätte den Nachteil: Darf dieser beim Bearbeiten entfernt
+        werden?
 * EXIT Code 2: Muss geschmissen werden, sobald mind. 1 Datei nicht
   umbenannt werden konnte
 * evtl. das --quite noch ein bisschen detaillierter (vlt. per --verbose)
