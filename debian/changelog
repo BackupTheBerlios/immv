@@ -1,3 +1,12 @@
+immv (0.2-1) unstable; urgency=low
+
+  * New upstream version
+    - Closing the editor without saving directly aborts
+    - When renaming directories, add a trailing slash to mark them
+    - correctly use exit code 2  
+
+ -- Marco Herrn <marco@mherrn.de>  Mon, 24 Aug 2009 09:30:18 +0200
+
 immv (0.1-2) unstable; urgency=low
 
   * added control file for BTS to allow the use of reportbug for filing bugs 
