@@ -1,22 +1,14 @@
-* Prüfen, dass übergebene Dateien keine Directories sind
-  Momentan scheint das erlaubt!
-  -> ist erledigt. ABER MACHT DAS SINN!?
-     Warum sollen nicht auch Verzeichnisse umbenannt werden können?
-     Hier müsste vielmehr der Code geändert werden, um immer den
-	 letzten Teil des Pfads (also auch bei Verzeichnissen) zu ändern
-	 -> Soll dann zur Kenntlichmachung ein / am Ende des Namens stehen?
-        Das hätte den Nachteil: Darf dieser beim Bearbeiten entfernt
-        werden?
-* EXIT Code 2: Muss geschmissen werden, sobald mind. 1 Datei nicht
-  umbenannt werden konnte
-* evtl. das --quite noch ein bisschen detaillierter (vlt. per --verbose)
-  - No change to file ist nicht immer interessant. Manchmal nur die
-    Änderungen
-* Allgemein die Ausgaben vlt. verkürzen
+* Allow renaming of directories
+  - What about a Slash / at the end of directory names to mark them?
+    Is it allowed to remove this slash on editing?
+* Exit Code 2: Must be returned if at least one file failed
+* Finer grained output (maybe --verbose, not --quiet)
+  - "No change to file" is often not of interest.
+* Shorten and canonicalize output
   /tmp/origfile0 -> /tmp/newfile0
   /tmp/origfile1 -> /tmp/newfile1 - Error! Permission denied
   /tmp/origfile3 -> /tmp/newfile3
-  oder an erster Stelle ein einzelnes Zeichen mit Erfolgsnachricht
-  z.B. ! = Fehler, ' ' = Alles ok
-  oder ! = Fehler, ' ' = keine Änderung, . = alles ok
-* Testfälle schreiben (unit + vlt. händische)
+  Maybe at the first char the success
+  i.e. '!' == Error, ' ' == success
+    or '!' == Error, ' ' == no change, '.' == success
+* Automatic testing (unit test doesn't help?)
