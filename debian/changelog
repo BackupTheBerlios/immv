@@ -1,3 +1,10 @@
+immv (0.1-2) unstable; urgency=low
+
+  * added control file for BTS to allow the use of reportbug for filing bugs 
+  * added watch file
+
+ -- Marco Herrn <marco@mherrn.de>  Sun, 23 Aug 2009 15:53:24 +0200
+
 immv (0.1-1) unstable; urgency=low
 
   * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>

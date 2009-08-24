@@ -1,0 +1,18 @@
+Error cases
+===========
+* File to rename doesn't exist
+* File to rename doesn't exist during rename (meanwhile deleted)
+* missing permissions to rename
+* Number of files changed
+* Some args are not existing files
+
+Abort cases
+===========
+* Editor was closed without writing the file
+* no args given -> print help
+
+Not an error
+============
+* A file that won't be renamed doesn't exist anymore or has missing
+  permissions
+  Schreibrechte
