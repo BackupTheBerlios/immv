@@ -29,6 +29,20 @@ _EXIT_STATUS_ERROR= 2
 ##
 
 class FileNotFoundException(Exception):
+  """Thrown when trying to rename a file that doesn't exist.
+
+  """
+  def __init__(self, filename):
+    Exception.__init__(self)
+    self.filename= filename
+  def __str__(self):
+    return repr(self.filename)
+
+class NotARegularFileExecption(Exception):
+  """Thrown when trying to rename files that are not regular
+  files (for example directories.
+
+  """
   def __init__(self, filename):
     Exception.__init__(self)
     self.filename= filename
@@ -36,6 +50,11 @@ class FileNotFoundException(Exception):
     return repr(self.filename)
 
 class FileCountChangedException(Exception):
+  """Thrown when the number of files after editing has
+  changed. 
+  This is usually an accident.
+
+  """
   def __init__(self, orig_count, new_count):
     Exception.__init__(self)
     self.orig_count= orig_count
@@ -120,6 +139,8 @@ def _check_files_exist(filenames):
   for f in filenames:
     if not os.path.lexists(f):
       raise FileNotFoundException(f)
+    elif not os.path.isfile(f):
+      raise NotARegularFileException(f)
 
 
 def _call_editor(temp_file, options):
@@ -248,6 +269,8 @@ if __name__ == "__main__":
   except FileNotFoundException, e:
     _error("Error! File not found: "+e.filename)
     exit(_EXIT_STATUS_ABORT)
+  except NotARegularFileException, e:
+    _error("Error! File is not a regular file: "+e.filename)
 
   #create the temporary file to work on
   temp_file= _get_temp_file()
