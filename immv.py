@@ -38,16 +38,6 @@ class FileNotFoundException(Exception):
   def __str__(self):
     return repr(self.filename)
 
-class NotARegularFileExecption(Exception):
-  """Thrown when trying to rename files that are not regular
-  files (for example directories.
-
-  """
-  def __init__(self, filename):
-    Exception.__init__(self)
-    self.filename= filename
-  def __str__(self):
-    return repr(self.filename)
 
 class FileCountChangedException(Exception):
   """Thrown when the number of files after editing has
@@ -118,11 +108,31 @@ def _split_path_and_filenames(filenames):
   for f in filenames:
     if not os.path.lexists(f):
       raise FileNotFoundException(f)
+    if os.path.isdir(f):
+      f= _strip_trailing_slash(f)
     path, basename= os.path.split(f)
+    if os.path.isdir(f):
+      basename=basename+'/'
     paths.append(path)
     base_file_names.append(basename)
   return paths, base_file_names
-    
+
+
+def _strip_trailing_slash(dirname):
+  """Strip the trailing slash from a directory path
+
+  If the given directory name ends with a slash, it is removed. Otherwise
+  nothing is done.
+  There is no check whether this is a real directory or a valid dir name.
+
+  Returns the dirname without a trailing slash.
+
+  """
+  if dirname.endswith('/'):
+    return dirname[:-1]
+  else:
+    return dirname
+
 
 def _check_files_exist(filenames):
   """Check if all files in a given list actually exist.
@@ -139,8 +149,6 @@ def _check_files_exist(filenames):
   for f in filenames:
     if not os.path.lexists(f):
       raise FileNotFoundException(f)
-    elif not os.path.isfile(f):
-      raise NotARegularFileException(f)
 
 
 def _call_editor(temp_file, options):
@@ -202,6 +210,8 @@ def _do_rename(paths, base_file_names, new_file_names, options):
   if len(base_file_names) != len(new_file_names):
     raise FileCountChangedException(len(base_file_names), len(new_file_names))
 
+  error_in_processing= False
+
   for path, orig_filename, new_filename in \
       zip(paths, base_file_names, new_file_names):
     orig_path= os.path.join(path, orig_filename)
@@ -224,6 +234,7 @@ def _do_rename(paths, base_file_names, new_file_names, options):
       if not os.path.lexists(orig_path):
         _error("Error! File "+orig_path+" doesn't exist anymore?")
         skip_file= True
+        error_in_processing= True
 
       if not skip_file:
         _info("Rename file "+orig_path+" -> "+new_path, options)
@@ -231,8 +242,15 @@ def _do_rename(paths, base_file_names, new_file_names, options):
           shutil.move(orig_path, new_path)
         except IOError, e:
           _error("Error on "+new_path+": "+os.strerror(e.errno))
+          error_in_processing= True
         except Exception, e:
           _error("+Unexpected Error! "+repr(e)+"\n+Please file a bug report.")
+          error_in_processing= True
+
+  if error_in_processing:
+    return _EXIT_STATUS_ERROR
+  else:
+    return _EXIT_STATUS_OK
 
 
 def _ask_for_overwrite(old_file, new_file):
@@ -263,14 +281,13 @@ def _error(string):
 
 if __name__ == "__main__":
   (options, args)= _parse_commandline()
+  paths, base_file_names= None, None
   try:
     _check_files_exist(args)
     paths, base_file_names= _split_path_and_filenames(args)
   except FileNotFoundException, e:
     _error("Error! File not found: "+e.filename)
     exit(_EXIT_STATUS_ABORT)
-  except NotARegularFileException, e:
-    _error("Error! File is not a regular file: "+e.filename)
 
   #create the temporary file to work on
   temp_file= _get_temp_file()
@@ -301,7 +318,8 @@ if __name__ == "__main__":
       answer= raw_input("Continue with rename? (y/N): ")
       if not answer in ('y', 'Y', 'yes', 'Yes', 'YES'):
         exit(_EXIT_STATUS_ABORT)
-    _do_rename(paths, base_file_names, new_file_names, options)
+    exit_code= _do_rename(paths, base_file_names, new_file_names, options)
+    exit(exit_code)
   except FileCountChangedException, e:
     _error("Error! Number of files changed")
 #    _debug("Original filecount: "+str(e.orig_count)+ \

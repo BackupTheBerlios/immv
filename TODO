@@ -1,7 +1,3 @@
-* Allow renaming of directories
-  - What about a Slash / at the end of directory names to mark them?
-    Is it allowed to remove this slash on editing?
-* Exit Code 2: Must be returned if at least one file failed
 * Finer grained output (maybe --verbose, not --quiet)
   - "No change to file" is often not of interest.
 * Shorten and canonicalize output
