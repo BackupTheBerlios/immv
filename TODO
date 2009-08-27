@@ -1,10 +1,3 @@
 * Finer grained output (maybe --verbose, not --quiet)
   - "No change to file" is often not of interest.
-* Shorten and canonicalize output
-  /tmp/origfile0 -> /tmp/newfile0
-  /tmp/origfile1 -> /tmp/newfile1 - Error! Permission denied
-  /tmp/origfile3 -> /tmp/newfile3
-  Maybe at the first char the success
-  i.e. '!' == Error, ' ' == success
-    or '!' == Error, ' ' == no change, '.' == success
 * Automatic testing (unit test doesn't help?)

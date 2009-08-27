@@ -4,6 +4,7 @@
 
    Rename multiple files at once by editing their names in
    a text editor.
+
 """
 
 __author__ = "Marco Herrn <marco@mherrn.de>"
@@ -22,6 +23,10 @@ import readline
 _EXIT_STATUS_OK= 0
 _EXIT_STATUS_ABORT= 1
 _EXIT_STATUS_ERROR= 2
+
+_MARK_ERROR=  "!"
+_MARK_CHANGE= "+"
+_MARK_SKIP=   " "
 
 ################################################################
 ##
@@ -151,7 +156,7 @@ def _check_files_exist(filenames):
       raise FileNotFoundException(f)
 
 
-def _call_editor(temp_file, options):
+def _call_editor(temp_file):
   env_editor= None
   if options.editor:
     env_editor= options.editor
@@ -201,12 +206,12 @@ def _simulate_rename(paths, base_file_names, new_file_names):
     orig_path= os.path.join(path, orig_filename)
     new_path= os.path.join(path, new_filename)
     if not orig_filename == new_filename:
-      _info(orig_path + ": -> " + new_path, options)
+      _print_action(_MARK_CHANGE, options.padding, orig_path, new_path)
     else:
-      _info(orig_path + ": no change", options)
+      _print_action(_MARK_SKIP, options.padding, orig_path, new_path)
 
 
-def _do_rename(paths, base_file_names, new_file_names, options):
+def _do_rename(paths, base_file_names, new_file_names):
   if len(base_file_names) != len(new_file_names):
     raise FileCountChangedException(len(base_file_names), len(new_file_names))
 
@@ -217,33 +222,34 @@ def _do_rename(paths, base_file_names, new_file_names, options):
     orig_path= os.path.join(path, orig_filename)
     new_path= os.path.join(path, new_filename)
     if orig_filename == new_filename:
-      _info("No change to file "+orig_path, options)
+      _print_action(_MARK_SKIP, options.padding, orig_path, new_path)
     else:
       skip_file= False
       if os.path.lexists(new_path):
         if options.interactive:
           confirmed= _ask_for_overwrite(orig_path, new_path)
           if not confirmed:
-            _info("Skipped file "+orig_path, options)
+            _print_action(_MARK_SKIP, options.padding, orig_path, new_path)
             skip_file= True
         elif not options.overwrite_files:
-          _info("Skipped file "+orig_path+" (target name exists)", options)
+          _print_action(_MARK_SKIP, options.padding, orig_path, new_path, "Target name exists")
           skip_file= True
 
       #again test if the orig file still exists
-      if not os.path.lexists(orig_path):
-        _error("Error! File "+orig_path+" doesn't exist anymore?")
+      if not skip_file and not os.path.lexists(orig_path):
+        _print_action(_MARK_ERROR, options.padding, orig_path, new_path, "File doesn't exist anymore?")
         skip_file= True
         error_in_processing= True
 
       if not skip_file:
-        _info("Rename file "+orig_path+" -> "+new_path, options)
         try:
           shutil.move(orig_path, new_path)
+          _print_action(_MARK_CHANGE, options.padding, orig_path, new_path)
         except IOError, e:
-          _error("Error on "+new_path+": "+os.strerror(e.errno))
+          _print_action(_MARK_ERROR, options.padding, orig_path, new_path, os.strerror(e.errno))
           error_in_processing= True
         except Exception, e:
+          _print_action(_MARK_ERROR, options.padding, orig_path, new_path, os.strerror(e.errno))
           _error("+Unexpected Error! "+repr(e)+"\n+Please file a bug report.")
           error_in_processing= True
 
@@ -262,16 +268,36 @@ def _ask_for_overwrite(old_file, new_file):
     return False
 
 
-def _info(string, options):
+def _info(string):
   """Prints an informational message, unless --quiet was set"""
   if options.verbose:
     print string
-
+  
 
 def _error(string):
   """Prints an error message to stderr. 
      The --quiet option doesn't avoid this."""
   sys.stderr.write(string+"\n")
+    
+    
+def _print_action(type, padding, orig_filename, new_filename, comment=None):
+  if options.verbose:
+    if type == _MARK_SKIP:
+      template= "%c %-"+str(padding)+"s"
+      print template % (type, orig_filename),
+    else:
+      template = "%c %-"+str(padding)+"s  -->  %s"
+      print template % (type, orig_filename, new_filename),
+    if comment:
+      print "- "+str(comment),
+    print ""
+
+
+def _get_max_len(list_of_strings):
+  max_len= 0;
+  for string in list_of_strings:
+    max_len= max(max_len, len(string))
+  return max_len
 
 
 ################################################################
@@ -280,6 +306,7 @@ def _error(string):
 ##
 
 if __name__ == "__main__":
+  global options
   (options, args)= _parse_commandline()
   paths, base_file_names= None, None
   try:
@@ -296,7 +323,7 @@ if __name__ == "__main__":
   mtime_before= os.path.getmtime(temp_file.name)
 
   try:
-    _call_editor(temp_file, options)
+    _call_editor(temp_file)
   except OSError, e:
     _error("Error calling editor: "+e.strerror)
     exit(_EXIT_STATUS_ABORT)
@@ -311,14 +338,18 @@ if __name__ == "__main__":
   temp_file.close()
   new_file_names= _strip_eol(lines)
 
+
+  #count length of orig_filenames
+  options.padding= str(_get_max_len(args))
+
   #Now do the rename
   try:
     if options.needs_confirmation:
-      _simulate_rename(paths, base_file_names, new_file_names, options)
+      _simulate_rename(paths, base_file_names, new_file_names)
       answer= raw_input("Continue with rename? (y/N): ")
       if not answer in ('y', 'Y', 'yes', 'Yes', 'YES'):
         exit(_EXIT_STATUS_ABORT)
-    exit_code= _do_rename(paths, base_file_names, new_file_names, options)
+    exit_code= _do_rename(paths, base_file_names, new_file_names)
     exit(exit_code)
   except FileCountChangedException, e:
     _error("Error! Number of files changed")
