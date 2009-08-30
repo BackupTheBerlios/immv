@@ -1,3 +1,4 @@
+* mention new output format in manpage
 * Finer grained output (maybe --verbose, not --quiet)
   - "No change to file" is often not of interest.
 * Automatic testing (unit test doesn't help?)
