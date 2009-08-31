@@ -1,3 +1,4 @@
+* What happens when a filename is empty?
 * Finer grained output (maybe --verbose, not --quiet)
   - "No change to file" is often not of interest.
 * Shorten and canonicalize output
