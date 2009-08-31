@@ -54,6 +54,53 @@ OPTIONS
 *-e* 'EDITOR', *--editor*='EDITOR'::
     editor to use for editing the filenames
 
+OUTPUT
+------
+The output of immv is formatted for easy human readability as well as easy
+parsing by other tools. It consists of three parts, a character indicating
+the success state of the change, the changed file (and the result if
+appropriate) and a more detailed message if necessary. All in one line.
+
+The possible outcomes are:
+
+*Success*::
+	Indicated by a plus sign (*+*), followed by the original filename and
+	the new filename.
+
+*No change*::
+	Indicated by a blank space, followed by the original filename an
+	possibly an additional message, if actually a rename was requested.
+
+*Error*::
+	Indicated by an exclamation mark (*!*), followed by the original
+	filename and the requested new filename. Usually followed by an
+	additional message describing the error.
+
+Here is an example of the output of all three possible success states:
+
+-----------------------------------------------------------
++ a/bneido/ciekd  -->  a/bneido/Ciekd
+  a/bneido/Aiei
+! a/aragon/Anad   -->  a/aragon/anad - Permission denied
+-----------------------------------------------------------
+
+///////////////////////////////////////////////////////////////////
+* *::
+	(blank space) No change. No change was requested. May include a
+	description if actually a rename was requested but couldn't be
+	fulfilled.
+
+*!*::
+	Error. A rename was requested, but resulted in an error. Usually
+	includes a description of the error.
+
+
+Examples::
+	+ a/bneido/ciekd   -->  a/bneido/Ciekd
+	  a/bneido/Aiei
+	! a/aragon/Anad    -->  a/aragon/anad - Permission denied 
+///////////////////////////////////////////////////////////////////
+
 
 EXIT STATUS
 -----------

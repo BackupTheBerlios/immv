@@ -123,6 +123,51 @@
 	</dd>
     </dl></div>
   </div>
+  <h2 id="_output">OUTPUT</h2>
+  <div class="sectionbody">
+    <div class="paragraph"><p>The output of immv is formatted for easy human readability as well as easy
+	parsing by other tools. It consists of three parts, a character indicating
+	the success state of the change, the changed file (and the result if
+	appropriate) and a more detailed message if necessary. All in one line.</p></div>
+    <div class="paragraph"><p>The possible outcomes are:</p></div>
+    <div class="dlist"><dl>
+	<dt class="hdlist1">
+	  <strong>Success</strong>
+	</dt>
+	<dd>
+	  <p>
+            Indicated by a plus sign (<strong>+</strong>), followed by the original filename and
+            the new filename.
+	  </p>
+	</dd>
+	<dt class="hdlist1">
+	  <strong>No change</strong>
+	</dt>
+	<dd>
+	  <p>
+            Indicated by a blank space, followed by the original filename an
+            possibly an additional message, if actually a rename was requested.
+	  </p>
+	</dd>
+	<dt class="hdlist1">
+	  <strong>Error</strong>
+	</dt>
+	<dd>
+	  <p>
+            Indicated by an exclamation mark (<strong>!</strong>), followed by the original
+            filename and the requested new filename. Usually followed by an
+            additional message describing the error.
+	  </p>
+	</dd>
+    </dl></div>
+    <div class="paragraph"><p>Here is an example of the output of all three possible success states:</p></div>
+    <div class="listingblock">
+      <div class="content">
+	<pre><tt>+ a/bneido/ciekd  --&gt;  a/bneido/Ciekd
+  a/bneido/Aiei
+! a/aragon/Anad   --&gt;  a/aragon/anad - Permission denied</tt></pre>
+    </div></div>
+  </div>
   <h2 id="_exit_status">EXIT STATUS</h2>
   <div class="sectionbody">
     <div class="dlist"><dl>
