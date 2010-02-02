@@ -1,3 +1,16 @@
+immv (0.3-1.1) unstable; urgency=low
+
+  * Provided a build script for building the packages
+
+ -- Marco Herrn <marco@mherrn.de>  Tue, 02 Feb 2010 16:21:20 +0100
+
+immv (0.3-1) unstable; urgency=low
+
+  * New upstream version
+    - Unified output format
+
+ -- Marco Herrn <marco@mherrn.de>  Tue, 01 Sep 2009 21:17:34 +0200
+
 immv (0.2-1) unstable; urgency=low
 
   * New upstream version
