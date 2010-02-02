@@ -8,7 +8,7 @@
 """
 
 __author__ = "Marco Herrn <marco@mherrn.de>"
-__version__= "0.1"
+__version__= "0.3"
 __license__= "GPL"
 
 from optparse import OptionParser
