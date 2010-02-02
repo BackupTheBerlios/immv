@@ -1,4 +1,4 @@
-immv (0.3-1.1) unstable; urgency=low
+immv (0.3-2) unstable; urgency=low
 
   * Provided a build script for building the packages
 
